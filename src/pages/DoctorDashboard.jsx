@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Calendar, Settings, LogOut, CheckCircle, XCircle, Filter } from 'lucide-react'
+import { Calendar, Settings, LogOut, CheckCircle, XCircle, Filter, MessageCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { getAppointmentsByDoctor, updateAppointmentStatus } from '../api/appointments'
 import { getCurrentUser } from '../api/auth'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../supabase/client'
+import { getChatsByDoctor } from '../api/chat'
+import ChatWindow from '../components/ChatWindow'
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('appointments')
@@ -13,6 +15,8 @@ const DoctorDashboard = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [filter, setFilter] = useState('all')
+  const [chats, setChats] = useState([])
+  const [activeChat, setActiveChat] = useState(null)
   const [profileData, setProfileData] = useState({
     name: '', specialization: '', experience: '', fee: '',
     phone: '', hospital: '', clinic: '', location: '',
@@ -25,16 +29,6 @@ const DoctorDashboard = () => {
     getCurrentUser().then(user => {
       if (!user) { navigate('/login'); return }
       setCurrentUser(user)
-      setProfileData({
-        name: user.name || '',
-        specialization: user.specialization || '',
-        experience: user.experience || '',
-        fee: '',
-        phone: user.phone || '',
-        hospital: '', clinic: '', location: '',
-        description: '', available_time: '', slots: ''
-      })
-      // Load doctor profile
       supabase.from('doctors').select('*').eq('id', user.id).single()
         .then(({ data }) => {
           if (data) {
@@ -56,6 +50,9 @@ const DoctorDashboard = () => {
       getAppointmentsByDoctor(user.id).then(result => {
         if (result.success) setAppointments(result.data)
         setLoading(false)
+      })
+      getChatsByDoctor(user.id).then(result => {
+        if (result.success) setChats(result.data)
       })
     })
   }, [])
@@ -106,7 +103,6 @@ const DoctorDashboard = () => {
   }
 
   const filteredAppointments = filter === 'all' ? appointments : appointments.filter(a => a.status === filter)
-
   const today = new Date().toISOString().split('T')[0]
   const stats = {
     totalAppointments: appointments.length,
@@ -155,11 +151,17 @@ const DoctorDashboard = () => {
             <nav className="space-y-2">
               {[
                 { key: 'appointments', label: 'Appointments', icon: <Calendar className="h-5 w-5 mr-3" /> },
+                { key: 'chats', label: 'Patient Chats', icon: <MessageCircle className="h-5 w-5 mr-3" /> },
                 { key: 'profile', label: 'Complete Profile', icon: <Settings className="h-5 w-5 mr-3" /> }
               ].map(item => (
                 <button key={item.key} onClick={() => setActiveTab(item.key)}
                   className={`w-full flex items-center px-4 py-3 rounded-lg transition ${activeTab === item.key ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'}`}>
                   {item.icon}{item.label}
+                  {item.key === 'chats' && chats.length > 0 && (
+                    <span className="ml-auto bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {chats.length}
+                    </span>
+                  )}
                 </button>
               ))}
               <button onClick={handleLogout} className="w-full flex items-center px-4 py-3 rounded-lg hover:bg-gray-50 transition text-red-600">
@@ -242,6 +244,42 @@ const DoctorDashboard = () => {
             </div>
           )}
 
+          {activeTab === 'chats' && (
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="px-6 py-4 border-b">
+                <h2 className="text-xl font-bold">Patient Chats ({chats.length})</h2>
+              </div>
+              {chats.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">
+                  <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>No patient chats yet.</p>
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {chats.map(chat => (
+                    <div key={chat.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                          <span className="text-red-600 font-bold text-lg">
+                            {chat.patient_name?.charAt(0)?.toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-semibold">{chat.patient_name}</p>
+                          <p className="text-sm text-gray-500">Tap to open chat</p>
+                        </div>
+                      </div>
+                      <button onClick={() => setActiveChat(chat)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm flex items-center">
+                        <MessageCircle className="h-4 w-4 mr-2" />Open Chat
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {activeTab === 'profile' && (
             <div className="bg-white rounded-xl shadow-lg p-8">
               <h2 className="text-xl font-bold mb-2">Complete Your Profile</h2>
@@ -290,13 +328,13 @@ const DoctorDashboard = () => {
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-red-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location (e.g. Karachi, Pakistan)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
                   <input type="text" value={profileData.location}
                     onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-red-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Available Time (e.g. 9:00 AM - 5:00 PM)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Available Time</label>
                   <input type="text" value={profileData.available_time}
                     onChange={(e) => setProfileData({ ...profileData, available_time: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-red-500" />
@@ -323,6 +361,14 @@ const DoctorDashboard = () => {
           )}
         </div>
       </div>
+
+      {activeChat && (
+        <ChatWindow
+          chat={activeChat}
+          currentUser={currentUser}
+          onClose={() => setActiveChat(null)}
+        />
+      )}
     </div>
   )
 }

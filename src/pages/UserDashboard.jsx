@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react'
-import { Calendar, Clock, User, LogOut, Plus, Trash2 } from 'lucide-react'
+import { Calendar, Clock, User, LogOut, Plus, Trash2, MessageCircle } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getAppointmentsByUser, updateAppointmentStatus, deleteAppointment } from '../api/appointments'
 import { getCurrentUser } from '../api/auth'
 import { useAuth } from '../context/AuthContext'
+import { getChatsByPatient } from '../api/chat'
+import ChatWindow from '../components/ChatWindow'
 
 const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState('appointments')
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState(null)
+  const [chats, setChats] = useState([])
+  const [activeChat, setActiveChat] = useState(null)
   const { logout } = useAuth()
   const navigate = useNavigate()
 
@@ -20,6 +24,9 @@ const UserDashboard = () => {
       getAppointmentsByUser(user.id).then(result => {
         if (result.success) setAppointments(result.data)
         setLoading(false)
+      })
+      getChatsByPatient(user.id).then(result => {
+        if (result.success) setChats(result.data)
       })
     })
   }, [])
@@ -75,6 +82,15 @@ const UserDashboard = () => {
               <button onClick={() => setActiveTab('appointments')}
                 className={`w-full flex items-center px-4 py-3 rounded-lg transition ${activeTab === 'appointments' ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'}`}>
                 <Calendar className="h-5 w-5 mr-3" />My Appointments
+              </button>
+              <button onClick={() => setActiveTab('chats')}
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition ${activeTab === 'chats' ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'}`}>
+                <MessageCircle className="h-5 w-5 mr-3" />My Chats
+                {chats.length > 0 && (
+                  <span className="ml-auto bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {chats.length}
+                  </span>
+                )}
               </button>
               <button onClick={() => setActiveTab('profile')}
                 className={`w-full flex items-center px-4 py-3 rounded-lg transition ${activeTab === 'profile' ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'}`}>
@@ -151,6 +167,41 @@ const UserDashboard = () => {
             </div>
           )}
 
+          {activeTab === 'chats' && (
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="px-6 py-4 border-b">
+                <h2 className="text-xl font-bold">My Chats ({chats.length})</h2>
+              </div>
+              {chats.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">
+                  <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>No chats yet.</p>
+                  <p className="text-sm mt-1">Book an appointment to start chatting with a doctor.</p>
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {chats.map(chat => (
+                    <div key={chat.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                          <span className="text-red-600 font-bold">Dr</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold">{chat.doctor_name}</p>
+                          <p className="text-sm text-gray-500">Tap to open chat</p>
+                        </div>
+                      </div>
+                      <button onClick={() => setActiveChat(chat)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm flex items-center">
+                        <MessageCircle className="h-4 w-4 mr-2" />Open Chat
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {activeTab === 'profile' && (
             <div className="bg-white rounded-xl shadow-lg p-8">
               <h2 className="text-xl font-bold mb-6">Profile Information</h2>
@@ -178,6 +229,14 @@ const UserDashboard = () => {
           )}
         </div>
       </div>
+
+      {activeChat && (
+        <ChatWindow
+          chat={activeChat}
+          currentUser={currentUser}
+          onClose={() => setActiveChat(null)}
+        />
+      )}
     </div>
   )
 }

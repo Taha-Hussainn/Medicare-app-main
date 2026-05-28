@@ -4,6 +4,7 @@ import { Calendar, Clock, User, Mail, Phone, AlertCircle, Check } from 'lucide-r
 import { getDoctorById } from '../api/doctors'
 import { createAppointment } from '../api/appointments'
 import { getCurrentUser } from '../api/auth'
+import { getOrCreateChat } from '../api/chat'
 
 const BookAppointment = () => {
   const { doctorId } = useParams()
@@ -57,8 +58,19 @@ const BookAppointment = () => {
       fee: doctor.fee,
       status: 'pending'
     })
-    if (result.success) setStep(4)
-    else alert('Failed to book appointment: ' + result.error)
+
+    if (result.success) {
+      // Auto-create chat between patient and doctor
+      await getOrCreateChat(
+        currentUser.id,
+        doctor.id,
+        currentUser.name,
+        doctor.name
+      )
+      setStep(4)
+    } else {
+      alert('Failed to book appointment: ' + result.error)
+    }
     setSubmitting(false)
   }
 
@@ -170,7 +182,7 @@ const BookAppointment = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Select Time Slot</label>
               <div className="grid grid-cols-3 gap-3">
-                {doctor.slots.map((slot) => (
+                {doctor.slots?.map((slot) => (
                   <button key={slot} onClick={() => setFormData({ ...formData, timeSlot: slot })}
                     className={`py-3 rounded-lg border font-medium transition ${
                       formData.timeSlot === slot ? 'bg-red-600 text-white border-red-600' : 'border-gray-300 hover:border-red-400'
@@ -229,9 +241,10 @@ const BookAppointment = () => {
             <Check className="h-10 w-10 text-green-600" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Appointment Booked!</h2>
-          <p className="text-gray-600 mb-6">Your appointment with {doctor.name} on {formData.date} at {formData.timeSlot} is confirmed.</p>
+          <p className="text-gray-600 mb-2">Your appointment with {doctor.name} on {formData.date} at {formData.timeSlot} is confirmed.</p>
+          <p className="text-gray-500 text-sm mb-6">A chat has been created — you can message your doctor from your dashboard.</p>
           <div className="flex space-x-4 justify-center">
-            <Link to="/dashboard" className="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700">View My Appointments</Link>
+            <Link to="/dashboard" className="bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700">View My Dashboard</Link>
             <Link to="/doctors" className="border border-gray-300 px-8 py-3 rounded-lg hover:bg-gray-50">Find More Doctors</Link>
           </div>
         </div>
