@@ -97,7 +97,7 @@ const About = () => {
     {
       icon: <Mail className="h-6 w-6" />,
       title: "Email Us",
-      details: ["support@Nucura.pk", "help@Nucura.pk"],
+      details: ["support@nucura.pk", "help@nucura.pk"],
       description: "Response within 24 hours"
     },
     {

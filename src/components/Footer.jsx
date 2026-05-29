@@ -37,7 +37,7 @@ const Footer = () => {
 
   const contactInfo = [
     { icon: <Phone className="h-5 w-5" />, text: '+92 1800-123-4567' },
-    { icon: <Mail className="h-5 w-5" />, text: 'support@Nucura.pk' },
+    { icon: <Mail className="h-5 w-5" />, text: 'support@nucura.pk' },
     { icon: <MapPin className="h-5 w-5" />, text: '123 Healthcare Street, Medical City, Pakistan' },
     { icon: <Clock className="h-5 w-5" />, text: '24/7 Emergency Support' },
   ]
