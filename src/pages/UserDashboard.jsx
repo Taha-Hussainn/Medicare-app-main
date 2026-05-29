@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Calendar, Clock, User, LogOut, Plus, Trash2, MessageCircle } from 'lucide-react'
+import { Calendar, Clock, User, LogOut, Plus, Trash2, MessageCircle, FileText } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getAppointmentsByUser, updateAppointmentStatus, deleteAppointment } from '../api/appointments'
 import { getCurrentUser } from '../api/auth'
 import { useAuth } from '../context/AuthContext'
 import { getChatsByPatient } from '../api/chat'
 import ChatWindow from '../components/ChatWindow'
+import { getPrescriptionsByPatient } from '../api/prescriptions'
+import PrescriptionCard from '../components/PrescriptionCard'
 
 const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState('appointments')
@@ -14,6 +16,7 @@ const UserDashboard = () => {
   const [currentUser, setCurrentUser] = useState(null)
   const [chats, setChats] = useState([])
   const [activeChat, setActiveChat] = useState(null)
+  const [prescriptions, setPrescriptions] = useState([])
   const { logout } = useAuth()
   const navigate = useNavigate()
 
@@ -27,6 +30,9 @@ const UserDashboard = () => {
       })
       getChatsByPatient(user.id).then(result => {
         if (result.success) setChats(result.data)
+      })
+      getPrescriptionsByPatient(user.id).then(result => {
+        if (result.success) setPrescriptions(result.data)
       })
     })
   }, [])
@@ -67,6 +73,7 @@ const UserDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Sidebar */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center space-x-4 mb-6">
@@ -92,6 +99,15 @@ const UserDashboard = () => {
                   </span>
                 )}
               </button>
+              <button onClick={() => setActiveTab('prescriptions')}
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition ${activeTab === 'prescriptions' ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'}`}>
+                <FileText className="h-5 w-5 mr-3" />Prescriptions
+                {prescriptions.length > 0 && (
+                  <span className="ml-auto bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {prescriptions.length}
+                  </span>
+                )}
+              </button>
               <button onClick={() => setActiveTab('profile')}
                 className={`w-full flex items-center px-4 py-3 rounded-lg transition ${activeTab === 'profile' ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'}`}>
                 <User className="h-5 w-5 mr-3" />Profile
@@ -104,6 +120,7 @@ const UserDashboard = () => {
           </div>
         </div>
 
+        {/* Main Content */}
         <div className="lg:col-span-3">
           {activeTab === 'appointments' && (
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -202,6 +219,25 @@ const UserDashboard = () => {
             </div>
           )}
 
+          {activeTab === 'prescriptions' && (
+            <div className="space-y-4">
+              <div className="bg-white rounded-xl shadow-lg px-6 py-4">
+                <h2 className="text-xl font-bold">My Prescriptions ({prescriptions.length})</h2>
+              </div>
+              {prescriptions.length === 0 ? (
+                <div className="bg-white rounded-xl shadow-lg p-8 text-center text-gray-500">
+                  <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>No prescriptions yet.</p>
+                  <p className="text-sm mt-1">Your doctor will add prescriptions after your appointment.</p>
+                </div>
+              ) : (
+                prescriptions.map(prescription => (
+                  <PrescriptionCard key={prescription.id} prescription={prescription} />
+                ))
+              )}
+            </div>
+          )}
+
           {activeTab === 'profile' && (
             <div className="bg-white rounded-xl shadow-lg p-8">
               <h2 className="text-xl font-bold mb-6">Profile Information</h2>
@@ -231,11 +267,7 @@ const UserDashboard = () => {
       </div>
 
       {activeChat && (
-        <ChatWindow
-          chat={activeChat}
-          currentUser={currentUser}
-          onClose={() => setActiveChat(null)}
-        />
+        <ChatWindow chat={activeChat} currentUser={currentUser} onClose={() => setActiveChat(null)} />
       )}
     </div>
   )

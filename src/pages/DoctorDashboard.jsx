@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Calendar, Settings, LogOut, CheckCircle, XCircle, Filter, MessageCircle } from 'lucide-react'
+import { Calendar, Settings, LogOut, CheckCircle, XCircle, Filter, MessageCircle, FileText } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { getAppointmentsByDoctor, updateAppointmentStatus } from '../api/appointments'
 import { getCurrentUser } from '../api/auth'
@@ -7,6 +7,9 @@ import { useAuth } from '../context/AuthContext'
 import { supabase } from '../supabase/client'
 import { getChatsByDoctor } from '../api/chat'
 import ChatWindow from '../components/ChatWindow'
+import { getPrescriptionsByDoctor } from '../api/prescriptions'
+import PrescriptionModal from '../components/PrescriptionModal'
+import PrescriptionCard from '../components/PrescriptionCard'
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('appointments')
@@ -17,6 +20,9 @@ const DoctorDashboard = () => {
   const [filter, setFilter] = useState('all')
   const [chats, setChats] = useState([])
   const [activeChat, setActiveChat] = useState(null)
+  const [prescriptions, setPrescriptions] = useState([])
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false)
+  const [selectedAppointment, setSelectedAppointment] = useState(null)
   const [profileData, setProfileData] = useState({
     name: '', specialization: '', experience: '', fee: '',
     phone: '', hospital: '', clinic: '', location: '',
@@ -54,6 +60,9 @@ const DoctorDashboard = () => {
       getChatsByDoctor(user.id).then(result => {
         if (result.success) setChats(result.data)
       })
+      getPrescriptionsByDoctor(user.id).then(result => {
+        if (result.success) setPrescriptions(result.data)
+      })
     })
   }, [])
 
@@ -62,7 +71,6 @@ const DoctorDashboard = () => {
     const slotsArray = profileData.slots
       ? profileData.slots.split(',').map(s => s.trim()).filter(Boolean)
       : []
-
     await supabase.from('doctors').update({
       name: profileData.name,
       specialization: profileData.specialization,
@@ -76,13 +84,11 @@ const DoctorDashboard = () => {
       slots: slotsArray,
       contact: { phone: profileData.phone, email: currentUser.email, website: '' }
     }).eq('id', currentUser.id)
-
     await supabase.from('users').update({
       name: profileData.name,
       specialization: profileData.specialization,
       phone: profileData.phone
     }).eq('id', currentUser.id)
-
     setSaving(false)
     alert('Profile updated successfully!')
   }
@@ -139,6 +145,7 @@ const DoctorDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Sidebar */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center space-x-4 mb-6">
@@ -152,6 +159,7 @@ const DoctorDashboard = () => {
               {[
                 { key: 'appointments', label: 'Appointments', icon: <Calendar className="h-5 w-5 mr-3" /> },
                 { key: 'chats', label: 'Patient Chats', icon: <MessageCircle className="h-5 w-5 mr-3" /> },
+                { key: 'prescriptions', label: 'Prescriptions', icon: <FileText className="h-5 w-5 mr-3" /> },
                 { key: 'profile', label: 'Complete Profile', icon: <Settings className="h-5 w-5 mr-3" /> }
               ].map(item => (
                 <button key={item.key} onClick={() => setActiveTab(item.key)}
@@ -160,6 +168,11 @@ const DoctorDashboard = () => {
                   {item.key === 'chats' && chats.length > 0 && (
                     <span className="ml-auto bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {chats.length}
+                    </span>
+                  )}
+                  {item.key === 'prescriptions' && prescriptions.length > 0 && (
+                    <span className="ml-auto bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {prescriptions.length}
                     </span>
                   )}
                 </button>
@@ -171,6 +184,7 @@ const DoctorDashboard = () => {
           </div>
         </div>
 
+        {/* Main Content */}
         <div className="lg:col-span-3">
           {activeTab === 'appointments' && (
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -237,6 +251,16 @@ const DoctorDashboard = () => {
                           </div>
                         </div>
                       </div>
+                      {/* Write Prescription Button */}
+                      <div className="mt-4 flex justify-end">
+                        <button onClick={() => {
+                          setSelectedAppointment(appointment)
+                          setShowPrescriptionModal(true)
+                        }}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center">
+                          <FileText className="h-4 w-4 mr-2" />Write Prescription
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -276,6 +300,25 @@ const DoctorDashboard = () => {
                     </div>
                   ))}
                 </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'prescriptions' && (
+            <div className="space-y-4">
+              <div className="bg-white rounded-xl shadow-lg px-6 py-4 border-b">
+                <h2 className="text-xl font-bold">Prescriptions ({prescriptions.length})</h2>
+              </div>
+              {prescriptions.length === 0 ? (
+                <div className="bg-white rounded-xl shadow-lg p-8 text-center text-gray-500">
+                  <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>No prescriptions yet.</p>
+                  <p className="text-sm mt-1">Write a prescription from the Appointments tab.</p>
+                </div>
+              ) : (
+                prescriptions.map(prescription => (
+                  <PrescriptionCard key={prescription.id} prescription={prescription} />
+                ))
               )}
             </div>
           )}
@@ -363,10 +406,20 @@ const DoctorDashboard = () => {
       </div>
 
       {activeChat && (
-        <ChatWindow
-          chat={activeChat}
+        <ChatWindow chat={activeChat} currentUser={currentUser} onClose={() => setActiveChat(null)} />
+      )}
+
+      {showPrescriptionModal && selectedAppointment && (
+        <PrescriptionModal
+          appointment={selectedAppointment}
           currentUser={currentUser}
-          onClose={() => setActiveChat(null)}
+          onClose={() => {
+            setShowPrescriptionModal(false)
+            setSelectedAppointment(null)
+          }}
+          onCreated={(newPrescription) => {
+            setPrescriptions(prev => [newPrescription, ...prev])
+          }}
         />
       )}
     </div>
