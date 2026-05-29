@@ -83,7 +83,7 @@ const Signup = () => {
             Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Join MediCare today
+            Join Nucura today
           </p>
         </div>
 

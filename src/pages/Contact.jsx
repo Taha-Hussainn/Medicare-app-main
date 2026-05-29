@@ -27,7 +27,7 @@ const Contact = () => {
     {
       icon: <Mail className="h-6 w-6" />,
       title: "Email Us",
-      details: ["support@medicare.pk", "help@medicare.pk"],
+      details: ["support@Nucura.pk", "help@Nucura.pk"],
       description: "Response within 24 hours"
     },
     {
@@ -163,7 +163,7 @@ const Contact = () => {
             
             <div className="bg-white p-6 rounded-xl shadow">
               <h3 className="font-semibold text-gray-900 mb-2">Are the doctors verified?</h3>
-              <p className="text-gray-600">All doctors on MediCare are verified with proper credentials, licenses, and experience.</p>
+              <p className="text-gray-600">All doctors on Nucura are verified with proper credentials, licenses, and experience.</p>
             </div>
             
             <div className="bg-white p-6 rounded-xl shadow">

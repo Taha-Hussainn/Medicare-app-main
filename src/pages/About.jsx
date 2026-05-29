@@ -97,7 +97,7 @@ const About = () => {
     {
       icon: <Mail className="h-6 w-6" />,
       title: "Email Us",
-      details: ["support@medicare.pk", "help@medicare.pk"],
+      details: ["support@Nucura.pk", "help@Nucura.pk"],
       description: "Response within 24 hours"
     },
     {
@@ -119,7 +119,7 @@ const About = () => {
                 <Heart className="h-8 w-8 text-red-600" />
               </div>
               <h1 className="text-4xl md:text-6xl font-bold text-gray-900">
-                About <span className="text-red-600">MediCare</span>
+                About <span className="text-red-600">Nucura</span>
               </h1>
             </div>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -135,7 +135,7 @@ const About = () => {
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
             <p className="text-gray-600 mb-4">
-              Founded in 2020, MediCare started with a simple vision: to bridge the gap between patients and healthcare providers. We noticed that finding the right doctor and booking appointments was often a time-consuming and stressful process.
+              Founded in 2020, Nucura started with a simple vision: to bridge the gap between patients and healthcare providers. We noticed that finding the right doctor and booking appointments was often a time-consuming and stressful process.
             </p>
             <p className="text-gray-600 mb-4">
               Today, we've grown to become one of Pakistan's leading healthcare platforms, serving millions of patients across the country. Our team of healthcare professionals, technologists, and customer service experts work together to deliver exceptional healthcare experiences.
@@ -162,7 +162,7 @@ const About = () => {
       <section className="bg-gray-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose MediCare?</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose Nucura?</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               We combine technology with healthcare expertise to deliver the best patient experience
             </p>

@@ -25,11 +25,11 @@ const Navbar = () => {
             <Link to="/" className="flex items-center space-x-2">
               <img
                 src="/logo.png"
-                alt="MediCare Logo"
+                alt="Nucura Logo"
                 className="h-10 w-10 object-contain rounded-lg"
                 style={{ mixBlendMode: 'multiply' }}
               />
-              <span className="text-2xl font-bold text-red-600">MediCare</span>
+              <span className="text-2xl font-bold text-red-600">Nucura</span>
             </Link>
           </div>
 

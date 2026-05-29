@@ -37,7 +37,7 @@ const Footer = () => {
 
   const contactInfo = [
     { icon: <Phone className="h-5 w-5" />, text: '+92 1800-123-4567' },
-    { icon: <Mail className="h-5 w-5" />, text: 'support@medicare.pk' },
+    { icon: <Mail className="h-5 w-5" />, text: 'support@Nucura.pk' },
     { icon: <MapPin className="h-5 w-5" />, text: '123 Healthcare Street, Medical City, Pakistan' },
     { icon: <Clock className="h-5 w-5" />, text: '24/7 Emergency Support' },
   ]
@@ -54,7 +54,7 @@ const Footer = () => {
               <div className="h-10 w-10 bg-red-600 rounded-full flex items-center justify-center mr-3">
                 <Heart className="h-6 w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold">MediCare</span>
+              <span className="text-2xl font-bold">Nucura</span>
             </div>
             <p className="text-gray-400 mb-6">
               Pakistan's leading healthcare platform connecting patients with trusted doctors for better health outcomes.
@@ -176,7 +176,7 @@ const Footer = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-500 text-sm mb-4 md:mb-0">
-              © {new Date().getFullYear()} MediCare. All rights reserved.
+              © {new Date().getFullYear()} Nucura. All rights reserved.
             </div>
             <div className="flex items-center space-x-6">
               <Link to="/privacy" className="text-gray-400 hover:text-white text-sm transition">

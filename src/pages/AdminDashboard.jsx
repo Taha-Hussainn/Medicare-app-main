@@ -63,7 +63,7 @@ const AdminDashboard = () => {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage MediCare platform</p>
+          <p className="text-gray-600">Manage Nucura platform</p>
         </div>
         <div className="flex items-center space-x-3">
           <div className="flex items-center px-4 py-2 bg-red-50 text-red-700 rounded-lg">

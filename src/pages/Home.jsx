@@ -45,7 +45,7 @@ const Home = () => {
     {
       name: "Mahad Hasan",
       role: "Patient",
-      content: "Found the perfect cardiologist through MediCare. The booking was seamless and the doctor was excellent!",
+      content: "Found the perfect cardiologist through Nucura. The booking was seamless and the doctor was excellent!",
       rating: 5
     },
     {
@@ -192,7 +192,7 @@ const Home = () => {
       <section className="bg-gradient-to-b from-gray-50 to-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">How MediCare Works</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">How Nucura Works</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Three simple steps to get the healthcare you need
             </p>
@@ -250,7 +250,7 @@ const Home = () => {
       {/* Features Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose MediCare?</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose Nucura?</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             We're revolutionizing healthcare with technology and compassion
           </p>
@@ -308,15 +308,15 @@ const Home = () => {
         </div>
       </section>
 
-      {/* About MediCare */}
+      {/* About Nucura */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">
-              About <span className="text-red-600">MediCare</span>
+              About <span className="text-red-600">Nucura</span>
             </h2>
             <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
-              MediCare is Pakistan's premier digital healthcare platform, bridging the gap between 
+              Nucura is Pakistan's premier digital healthcare platform, bridging the gap between 
               patients and top medical professionals. Our mission is to make quality healthcare 
               accessible, affordable, and convenient for every Pakistani.
             </p>
@@ -351,7 +351,7 @@ const Home = () => {
               to="/about"
               className="inline-flex items-center text-red-600 font-semibold hover:text-red-700 text-sm sm:text-base"
             >
-              Learn more about MediCare
+              Learn more about Nucura
               <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
             </Link>
           </div>
@@ -397,7 +397,7 @@ const Home = () => {
           <Heart className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 sm:mb-6" />
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">Begin Your Health Journey Today</h2>
           <p className="text-lg sm:text-xl opacity-90 mb-8 sm:mb-10 max-w-3xl mx-auto">
-            Join over 1 million patients who trust MediCare for their healthcare. 
+            Join over 1 million patients who trust Nucura for their healthcare. 
             Experience the future of medical care with just a few clicks.
           </p>
           
